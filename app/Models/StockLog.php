@@ -10,6 +10,8 @@ class StockLog extends Model
 {
   use HasFactory, HasUuids;
 
+  protected $with = ['stock'];
+
   protected $fillable = [
     'stock_id',
     'amount',

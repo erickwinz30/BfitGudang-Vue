@@ -23,7 +23,6 @@ const form = useForm({
   demand: "",
   highest_sales: "",
   longest_lead_time: "",
-  stock: "",
 });
 
 const submit = () => {
@@ -53,7 +52,6 @@ form.lead_time = stock.value.lead_time;
 form.demand = stock.value.demand;
 form.highest_sales = stock.value.highest_sales;
 form.longest_lead_time = stock.value.longest_lead_time;
-form.stock = stock.value.stock;
 </script>
 
 <template>
@@ -179,23 +177,6 @@ form.stock = stock.value.stock;
                 id="longest_lead_time"
                 name="longest_lead_time"
                 v-model="form.longest_lead_time"
-                class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
-                placeholder="20"
-                required
-              />
-            </div>
-            <div class="mb-5">
-              <label
-                for="stock"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Jumlah Stock</label
-              >
-              <input
-                type="text"
-                inputmode="numeric"
-                id="stock"
-                name="stock"
-                v-model="form.stock"
                 class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
                 placeholder="20"
                 required

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Stock;
+use App\Models\StockLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -61,8 +62,15 @@ class StockController extends Controller
       $validatedData['reorder_point'] = $reorder_point;
 
       $stock = Stock::create($validatedData);
-
       Log::info('Stock created successfully', $validatedData);
+
+      $stockLog = StockLog::create([
+        'stock_id' => $stock->id,
+        'amount' => $validatedData['stock'],
+        'status' => 'Baru',
+        'description' => 'Stock baru',
+      ]);
+      Log::info('Stock log created successfully', $stockLog->toArray());
 
       return Inertia::render('Admin/Index', [
         'status' => 'Stock created successfully',
@@ -180,6 +188,14 @@ class StockController extends Controller
       $stock->update($validatedData);
       Log::info('Stock updated successfully', $validatedData);
 
+      $stockLog = StockLog::create([
+        'stock_id' => $stock->id,
+        'amount' => $validatedData['stock'],
+        'status' => 'Baru',
+        'description' => 'Stock baru',
+      ]);
+      Log::info('Stock log created successfully', $stockLog->toArray());
+
       return Inertia::render('Admin/Index', [
         'status' => 'Stock updated successfully',
         'stocks' => Stock::where('is_deleted', false)->get(),
@@ -213,6 +229,100 @@ class StockController extends Controller
       return Inertia::render('Admin/Index', [
         'status' => 'Error deleting stock: ' . $e->getMessage(),
         'stocks' => Stock::where('is_deleted', false)->get(),
+      ]);
+    }
+  }
+
+  public function entryForm(String $id)
+  {
+    $stock = Stock::select('id', 'name', 'code')->where('id', $id)->first();
+
+    return Inertia::render('Admin/Stocks/Add', [
+      'stock' => $stock,
+    ]);
+  }
+
+  public function storeEntry(String $id, Request $request)
+  {
+    try {
+      $validatedData = $request->validate([
+        'amount' => 'required|integer|min:0',
+        'status' => 'required|string|max:255',
+        'description' => 'nullable|string|max:255',
+      ]);
+
+      $stock = Stock::where('id', $id)->firstOrFail();
+      $stockAmount = $stock->stock;
+
+      $newStockAmount = $validatedData['amount'] + $stockAmount;
+      Log::info($newStockAmount);
+
+      $stock->update(['stock' => $newStockAmount]);
+
+      $stockLog = StockLog::create([
+        'stock_id' => $stock->id,
+        'amount' => $validatedData['amount'],
+        'status' => $validatedData['status'],
+        'description' => $validatedData['description'] ?? 'Stock Bertambah',
+      ]);
+      Log::info('Stock Entry Succesfully', $stockLog->toArray());
+
+      return Inertia::render('Admin/Index', [
+        'status' => 'Stock entry stored successfully',
+        'stocks' => Stock::where('is_deleted', false)->get(),
+      ]);
+    } catch (\Exception $e) {
+      Log::error('Error storing stock entry: ' . $e->getMessage());
+      return Inertia::render('Admin/Stocks/Add', [
+        'status' => 'Error storing stock entry: ' . $e->getMessage(),
+        'stock' => Stock::select('id', 'name', 'code')->where('id', $id)->first(),
+      ]);
+    }
+  }
+
+  public function reduceForm(String $id)
+  {
+    $stock = Stock::select('id', 'name', 'code')->where('id', $id)->first();
+
+    return Inertia::render('Admin/Stocks/Reduce', [
+      'stock' => $stock,
+    ]);
+  }
+
+  public function storeReduce(String $id, Request $request)
+  {
+    try {
+      $validatedData = $request->validate([
+        'amount' => 'required|integer|min:0',
+        'status' => 'required|string|max:255',
+        'description' => 'nullable|string|max:255',
+      ]);
+
+      $stock = Stock::where('id', $id)->firstOrFail();
+      $stockAmount = $stock->stock;
+
+      $newStockAmount = $stockAmount - $validatedData['amount'];
+      Log::info($newStockAmount);
+
+      $stock->update(['stock' => $newStockAmount]);
+
+      $stockLog = StockLog::create([
+        'stock_id' => $stock->id,
+        'amount' => $validatedData['amount'],
+        'status' => $validatedData['status'],
+        'description' => $validatedData['description'] ?? 'Stock reduced',
+      ]);
+      Log::info('Stock Reduce Succesfully', $stockLog->toArray());
+
+      return Inertia::render('Admin/Index', [
+        'status' => 'Stock reduced successfully',
+        'stocks' => Stock::where('is_deleted', false)->get(),
+      ]);
+    } catch (\Exception $e) {
+      Log::error('Error storing stock reduce: ' . $e->getMessage());
+      return Inertia::render('Admin/Stocks/Reduce', [
+        'status' => 'Error storing stock reduce: ' . $e->getMessage(),
+        'stock' => Stock::select('id', 'name', 'code')->where('id', $id)->first(),
       ]);
     }
   }

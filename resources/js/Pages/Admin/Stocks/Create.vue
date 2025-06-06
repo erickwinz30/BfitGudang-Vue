@@ -25,7 +25,7 @@ const form = useForm({
 });
 
 const submit = () => {
-  form.post("/");
+  form.post("/stocks");
 };
 </script>
 

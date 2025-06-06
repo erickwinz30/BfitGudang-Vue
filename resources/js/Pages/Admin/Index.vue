@@ -71,7 +71,7 @@ const submitDelete = (id) => {
                 />
               </div>
               <a
-                href="/create"
+                href="/stocks/create"
                 type="button"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
@@ -119,19 +119,33 @@ const submitDelete = (id) => {
                   <td class="px-6 py-4">{{ stock.safety_stock }}</td>
                   <td class="px-6 py-4">{{ stock.reorder_point }}</td>
                   <td class="px-6 py-4">
-                    <a
-                      :href="`/stocks/${stock.id}/edit`"
-                      class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      >Edit</a
-                    >
-                    <form @submit.prevent="submitDelete(stock.id)">
-                      <button
-                        type="submit"
-                        class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                    <div class="flex space-x-4">
+                      <a
+                        :href="`/entry/${stock.id}`"
+                        class="font-medium text-green-600 dark:text-green-500 hover:underline"
+                        >Add</a
                       >
-                        Delete
-                      </button>
-                    </form>
+                      <a
+                        :href="`/reduce/${stock.id}`"
+                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >Reduce</a
+                      >
+                    </div>
+                    <div class="flex space-x-4">
+                      <a
+                        :href="`/stocks/${stock.id}/edit`"
+                        class="font-medium text-orange-400 dark:text-orange-400 hover:underline"
+                        >Edit</a
+                      >
+                      <form @submit.prevent="submitDelete(stock.id)">
+                        <button
+                          type="submit"
+                          class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               </tbody>
