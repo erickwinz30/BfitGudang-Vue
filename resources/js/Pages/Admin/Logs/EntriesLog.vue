@@ -115,7 +115,7 @@ watch(selectedRange, (val) => {
         <div class="relative w-full overflow-x-auto shadow-md">
           <SuccessAlert v-if="status" :message="status" />
           <div
-            class="flex flex-wrap items-center justify-between space-y-4 flex-column sm:flex-row sm:space-y-0"
+            class="flex flex-wrap items-center justify-between py-3 space-y-4 flex-column sm:flex-row sm:space-y-0"
           >
             <div>
               <button
@@ -296,13 +296,6 @@ watch(selectedRange, (val) => {
                   placeholder="Search for items"
                 />
               </div>
-              <a
-                href="/stocks/create"
-                type="button"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-              >
-                Add
-              </a>
             </div>
           </div>
           <div
