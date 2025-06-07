@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref } from "vue";
+import { defineProps, ref, computed, watch } from "vue";
 import App from "@/Pages/App.vue";
 
 const props = defineProps({
@@ -10,12 +10,108 @@ const props = defineProps({
 });
 
 const logs = ref(props.logs);
+const selectedRange = ref("thirty-days"); // default
+const selectedRangeText = ref("Last 30 days");
+
+const lastDay = () => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  console.log(logs.value);
+  console.log("Last Day Selected");
+  // selectedRangeText.value = "Last Day";
+  return logs.value.filter((log) => new Date(log.created_at) >= yesterday);
+};
+
+const last7Days = () => {
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+  // selectedRangeText.value = "Last 7 Days";
+  return logs.value.filter((log) => new Date(log.created_at) >= sevenDaysAgo);
+};
+
+const last30Days = () => {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  // selectedRangeText.value = "Last 30 Days";
+  return logs.value.filter((log) => new Date(log.created_at) >= thirtyDaysAgo);
+};
+
+const lastMonth = () => {
+  const today = new Date();
+  const firstDayOfLastMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() - 1,
+    1
+  );
+  const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+  // selectedRangeText.value = "Last Month";
+  return logs.value.filter(
+    (log) =>
+      new Date(log.created_at) >= firstDayOfLastMonth &&
+      new Date(log.created_at) <= lastDayOfLastMonth
+  );
+};
+
+const lastYear = () => {
+  const today = new Date();
+  const lastYearDate = new Date(
+    today.getFullYear() - 1,
+    today.getMonth(),
+    today.getDate()
+  );
+  console.log("Last Year Selected");
+  // selectedRangeText.value = "Last Year";
+  return logs.value.filter((log) => new Date(log.created_at) >= lastYearDate);
+};
+
+// Computed untuk hasil filter
+const filteredLogs = computed(() => {
+  switch (selectedRange.value) {
+    case "last-day":
+      return lastDay();
+    case "seven-days":
+      return last7Days();
+    case "thirty-days":
+      return last30Days();
+    case "last-month":
+      return lastMonth();
+    case "last-year":
+      return lastYear();
+    default:
+      return logs.value;
+  }
+});
+
+watch(selectedRange, (val) => {
+  switch (val) {
+    case "last-day":
+      selectedRangeText.value = "Last Day";
+      break;
+    case "seven-days":
+      selectedRangeText.value = "Last 7 Days";
+      break;
+    case "thirty-days":
+      selectedRangeText.value = "Last 30 Days";
+      break;
+    case "last-month":
+      selectedRangeText.value = "Last Month";
+      break;
+    case "last-year":
+      selectedRangeText.value = "Last Year";
+      break;
+    default:
+      selectedRangeText.value = "All";
+  }
+});
 </script>
 
 <template>
   <App>
     <div class="flex flex-col justify-center">
-      <div class="flex justify-center w-full px-[80px]">
+      <div class="flex justify-center w-full px-[40px]">
         <div class="relative w-full overflow-x-auto shadow-md">
           <SuccessAlert v-if="status" :message="status" />
           <div
@@ -39,7 +135,7 @@ const logs = ref(props.logs);
                     d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z"
                   />
                 </svg>
-                Last 30 days
+                {{ selectedRangeText }}
                 <svg
                   class="w-2.5 h-2.5 ms-2.5"
                   aria-hidden="true"
@@ -79,14 +175,15 @@ const logs = ref(props.logs);
                       class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       <input
-                        id="filter-radio-example-1"
+                        id="range-date-example-1"
                         type="radio"
-                        value=""
-                        name="filter-radio"
+                        value="last-day"
+                        name="range-date"
+                        v-model="selectedRange"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
-                        for="filter-radio-example-1"
+                        for="range-date-example-1"
                         class="w-full text-sm font-medium text-gray-900 rounded-sm ms-2 dark:text-gray-300"
                         >Last day</label
                       >
@@ -98,14 +195,15 @@ const logs = ref(props.logs);
                     >
                       <input
                         checked="true"
-                        id="filter-radio-example-2"
+                        id="range-date-example-2"
                         type="radio"
-                        value=""
-                        name="filter-radio"
+                        value="seven-days"
+                        name="range-date"
+                        v-model="selectedRange"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
-                        for="filter-radio-example-2"
+                        for="range-date-example-2"
                         class="w-full text-sm font-medium text-gray-900 rounded-sm ms-2 dark:text-gray-300"
                         >Last 7 days</label
                       >
@@ -116,14 +214,15 @@ const logs = ref(props.logs);
                       class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       <input
-                        id="filter-radio-example-3"
+                        id="range-date-example-3"
                         type="radio"
-                        value=""
-                        name="filter-radio"
+                        value="thirty-days"
+                        name="range-date"
+                        v-model="selectedRange"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
-                        for="filter-radio-example-3"
+                        for="range-date-example-3"
                         class="w-full text-sm font-medium text-gray-900 rounded-sm ms-2 dark:text-gray-300"
                         >Last 30 days</label
                       >
@@ -134,14 +233,15 @@ const logs = ref(props.logs);
                       class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       <input
-                        id="filter-radio-example-4"
+                        id="range-date-example-4"
                         type="radio"
-                        value=""
-                        name="filter-radio"
+                        value="last-month"
+                        name="range-date"
+                        v-model="selectedRange"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
-                        for="filter-radio-example-4"
+                        for="range-date-example-4"
                         class="w-full text-sm font-medium text-gray-900 rounded-sm ms-2 dark:text-gray-300"
                         >Last month</label
                       >
@@ -152,14 +252,15 @@ const logs = ref(props.logs);
                       class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       <input
-                        id="filter-radio-example-5"
+                        id="range-date-example-5"
                         type="radio"
-                        value=""
-                        name="filter-radio"
+                        value="last-year"
+                        name="range-date"
+                        v-model="selectedRange"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
-                        for="filter-radio-example-5"
+                        for="range-date-example-5"
                         class="w-full text-sm font-medium text-gray-900 rounded-sm ms-2 dark:text-gray-300"
                         >Last year</label
                       >
@@ -223,7 +324,7 @@ const logs = ref(props.logs);
                   <th scope="col" class="px-6 py-3">Tanggal Masuk</th>
                 </tr>
               </thead>
-              <tbody v-for="(log, index) in logs" :key="log.id">
+              <tbody v-for="(log, index) in filteredLogs" :key="log.id">
                 <tr
                   class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >

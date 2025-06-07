@@ -15,7 +15,8 @@ const props = defineProps({
 });
 
 const status = ref(props.status || null);
-const stocks = ref(props.stocks);
+const stocks = ref(props.stocks || null);
+const allStocks = ref(props.stocks || []);
 
 const submitDelete = (id) => {
   Swal.fire({
@@ -31,6 +32,13 @@ const submitDelete = (id) => {
       router.delete(`stocks/${id}`);
     }
   });
+};
+
+const onInput = (value) => {
+  const search = value.toLowerCase();
+  stocks.value = allStocks.value.filter(
+    (stock) => stock.name && stock.name.toLowerCase().includes(search)
+  );
 };
 </script>
 
@@ -66,7 +74,9 @@ const submitDelete = (id) => {
                 <input
                   type="text"
                   id="table-search"
+                  name="table-search"
                   class="block p-2 text-sm text-gray-900 border border-gray-300 rounded-lg ps-10 w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  @input="onInput($event.target.value)"
                   placeholder="Search for items"
                 />
               </div>
@@ -75,7 +85,7 @@ const submitDelete = (id) => {
                 type="button"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
-                Add
+                New
               </a>
             </div>
           </div>
